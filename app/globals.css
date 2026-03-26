@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "react-calendar-heatmap/dist/styles.css";
+
+:root {
+  --bg-primary: #0f172a;
+  --bg-card: #1e2a3a;
+  --bg-card-inner: #243044;
+}
+
+body {
+  background: linear-gradient(135deg, #0d1b2e 0%, #1a2744 50%, #0d1b2e 100%);
+  min-height: 100vh;
+  color: #e2e8f0;
+}
+
+/* ── Heatmap overrides ── */
+.react-calendar-heatmap text {
+  fill: #64748b;
+  font-size: 8px;
+}
+
+.react-calendar-heatmap .color-empty {
+  fill: #1e293b;
+  rx: 2;
+}
+
+.react-calendar-heatmap .color-scale-1 {
+  fill: #166534;
+}
+
+.react-calendar-heatmap .color-scale-2 {
+  fill: #16a34a;
+}
+
+.react-calendar-heatmap .color-scale-3 {
+  fill: #22c55e;
+}
+
+.react-calendar-heatmap .color-scale-4 {
+  fill: #4ade80;
+}
+
+.react-calendar-heatmap rect {
+  rx: 2;
+}
+
+.react-calendar-heatmap rect:hover {
+  stroke: #94a3b8;
+  stroke-width: 1;
+}
