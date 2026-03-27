@@ -33,19 +33,27 @@ export default async function ProfilePage() {
       <nav className="flex items-center justify-between px-6 py-4">
         <Link
           href="/home"
-          className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+          className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors cursor-default"
         >
           Commit
         </Link>
         <form action={logout}>
           <button
             type="submit"
-            className="text-slate-400 hover:text-slate-200 text-sm transition-colors"
+            className="text-slate-400 hover:text-slate-200 text-sm transition-colors cursor-default"
           >
             Sign Out
           </button>
         </form>
       </nav>
+      <div className="px-6 -mt-2 mb-2">
+        <Link
+          href="/home"
+          className="text-slate-400 hover:text-slate-200 text-sm transition-colors cursor-default"
+        >
+          &lt; Back
+        </Link>
+      </div>
 
       <main className="max-w-lg mx-auto px-4 py-10">
         <h1 className="text-2xl font-bold text-slate-100 mb-6">Profile</h1>

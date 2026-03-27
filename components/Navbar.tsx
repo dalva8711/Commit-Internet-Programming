@@ -6,7 +6,7 @@ export default function Navbar() {
     <nav className="flex items-center justify-between px-6 py-4">
       <Link
         href="/home"
-        className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors"
+        className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors cursor-default"
       >
         Commit
       </Link>
@@ -14,14 +14,14 @@ export default function Navbar() {
       <div className="flex items-center gap-4">
         <Link
           href="/profile"
-          className="text-cyan-400 font-semibold hover:text-cyan-300 transition-colors text-sm"
+          className="text-slate-400 hover:text-slate-200 text-sm transition-colors cursor-default pt-[1px]"
         >
           Profile
         </Link>
         <form action={logout}>
           <button
             type="submit"
-            className="text-slate-400 hover:text-slate-200 text-sm transition-colors"
+            className="text-slate-400 hover:text-slate-200 text-sm transition-colors cursor-default"
           >
             Sign Out
           </button>
