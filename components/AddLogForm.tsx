@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useEffect, useTransition } from "react";
 import { createLog } from "@/app/actions/logs";
 import type { Habit } from "@/lib/types";
 
@@ -17,6 +17,13 @@ export default function AddLogForm({ habits }: Props) {
   });
 
   const [habitId, setHabitId] = useState(habits[0]?.id ?? "");
+
+  useEffect(() => {
+    if (habits.length > 0 && !habits.some((h) => h.id === habitId)) {
+      setHabitId(habits[0].id);
+    }
+  }, [habits, habitId]);
+
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
