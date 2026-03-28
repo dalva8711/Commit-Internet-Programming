@@ -105,8 +105,7 @@ export default function AddLogForm({ habits }: Props) {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full py-2.5 rounded-lg text-white font-semibold text-sm disabled:opacity-50 transition-opacity"
-          style={{ background: "linear-gradient(90deg, #06b6d4, #7c3aed)" }}
+          className="w-full py-2.5 rounded-lg text-white font-semibold text-sm disabled:opacity-50 transition-opacity bg-cyan-500"
         >
           {isPending ? "Adding…" : "Add Log"}
         </button>

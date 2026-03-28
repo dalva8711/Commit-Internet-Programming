@@ -100,8 +100,7 @@ export default function HabitManager({ habits, onClose }: Props) {
           <button
             type="submit"
             disabled={isPending || !name.trim()}
-            className="w-full py-2 rounded-lg text-white text-sm font-semibold disabled:opacity-50 transition-opacity"
-            style={{ background: "linear-gradient(90deg, #06b6d4, #7c3aed)" }}
+            className="w-full py-2 rounded-lg text-white text-sm font-semibold disabled:opacity-50 transition-opacity bg-cyan-500"
           >
             {isPending ? "Adding…" : "Add Habit"}
           </button>
