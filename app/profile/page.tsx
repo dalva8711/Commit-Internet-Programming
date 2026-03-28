@@ -65,8 +65,7 @@ export default async function ProfilePage() {
           {/* Avatar placeholder */}
           <div className="flex items-center gap-4">
             <div
-              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900"
-              style={{ background: "linear-gradient(135deg, #06b6d4, #7c3aed)" }}
+              className="w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold text-slate-900 bg-cyan-500"
             >
               {(profile?.username ?? user.email ?? "?")[0].toUpperCase()}
             </div>
