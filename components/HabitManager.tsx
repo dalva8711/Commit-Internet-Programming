@@ -24,7 +24,8 @@ export default function HabitManager({ habits, onClose }: Props) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PRESET_COLORS[0]);
   const [error, setError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isAdding, startAddTransition] = useTransition();
+  const [isDeleting, startDeleteTransition] = useTransition();
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -33,7 +34,7 @@ export default function HabitManager({ habits, onClose }: Props) {
     formData.append("name", name);
     formData.append("color", color);
 
-    startTransition(async () => {
+    startAddTransition(async () => {
       const result = await createHabit(formData);
       if (result?.error) {
         setError(result.error);
@@ -44,7 +45,7 @@ export default function HabitManager({ habits, onClose }: Props) {
   }
 
   function handleDelete(id: string) {
-    startTransition(async () => {
+    startDeleteTransition(async () => {
       await deleteHabit(id);
     });
   }
@@ -99,10 +100,10 @@ export default function HabitManager({ habits, onClose }: Props) {
           {error && <p className="text-red-400 text-xs mb-2">{error}</p>}
           <button
             type="submit"
-            disabled={isPending || !name.trim()}
+            disabled={isAdding || !name.trim()}
             className="w-full py-2 rounded-lg text-white text-sm font-semibold disabled:opacity-50 transition-opacity bg-cyan-500"
           >
-            {isPending ? "Adding…" : "Add Habit"}
+            {isAdding ? "Adding…" : "Add Habit"}
           </button>
         </form>
 
@@ -123,7 +124,7 @@ export default function HabitManager({ habits, onClose }: Props) {
               </div>
               <button
                 onClick={() => handleDelete(h.id)}
-                disabled={isPending}
+                disabled={isDeleting}
                 className="text-red-400 hover:text-red-300 text-xs disabled:opacity-50"
               >
                 Remove
