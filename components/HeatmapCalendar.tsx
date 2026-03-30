@@ -18,6 +18,14 @@ function getClassForCount(count: number): string {
   return "color-scale-4";
 }
 
+const LEGEND_COLORS: Record<string, string> = {
+  "color-empty":   "#1e293b",
+  "color-scale-1": "#166534",
+  "color-scale-2": "#16a34a",
+  "color-scale-3": "#22c55e",
+  "color-scale-4": "#4ade80",
+};
+
 export default function HeatmapCalendar({ values }: Props) {
   const today = new Date();
   const startDate = new Date(today);
@@ -61,7 +69,7 @@ export default function HeatmapCalendar({ values }: Props) {
                 width="11"
                 height="11"
                 rx="2"
-                className={cls}
+                fill={LEGEND_COLORS[cls]}
               />
             </svg>
           )
