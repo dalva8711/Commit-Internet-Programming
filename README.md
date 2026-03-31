@@ -2,6 +2,10 @@
 
 A full-stack habit tracking app that visualizes your daily progress using a GitHub-style contribution heatmap.
 
+## Live Demo
+
+[https://commit-internet-programming-7o9aa2toz-diegos-projects-157935ce.vercel.app/login](https://commit-internet-programming-7o9aa2toz-diegos-projects-157935ce.vercel.app/login)
+
 ## Tech Stack
 
 - **Next.js 16** (App Router) + **TypeScript**
