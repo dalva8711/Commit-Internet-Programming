@@ -7,9 +7,15 @@
   --bg-card-inner: #243044;
 }
 
+html {
+  background-color: #0d1b2e;
+  color-scheme: dark;
+}
+
 body {
   background: linear-gradient(135deg, #0d1b2e 0%, #1a2744 50%, #0d1b2e 100%);
   min-height: 100vh;
+  min-height: 100dvh;
   color: #e2e8f0;
 }
 
