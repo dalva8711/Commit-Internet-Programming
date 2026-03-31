@@ -7,6 +7,11 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Commit",
   description: "Track your habits, visualize your progress.",
+  themeColor: "#0d1b2e",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+  },
 };
 
 export default function RootLayout({
