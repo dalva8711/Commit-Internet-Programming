@@ -4,7 +4,7 @@ A full-stack habit tracking app that visualizes your daily progress using a GitH
 
 ## Live Demo
 
-[https://commit-internet-programming-7o9aa2toz-diegos-projects-157935ce.vercel.app/login](https://commit-internet-programming-7o9aa2toz-diegos-projects-157935ce.vercel.app/login)
+[https://commit-internet-programming.vercel.app/login](https://commit-internet-programming.vercel.app/login)
 
 ## Tech Stack
 
