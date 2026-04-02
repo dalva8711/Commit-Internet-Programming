@@ -1,10 +1,20 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import { Tooltip } from "react-tooltip";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAttrs = any;
 import type { HeatmapValue } from "@/lib/types";
+
+// The library hardcodes `dayIndex & 1`, so only Mon/Wed/Fri are ever rendered.
+// We inject the 4 missing labels (Sun/Tue/Thu/Sat) directly into the SVG after mount.
+const MISSING_WEEKDAY_LABELS = [
+  { dayIndex: 0, label: "Sun" },
+  { dayIndex: 2, label: "Tue" },
+  { dayIndex: 4, label: "Thu" },
+  { dayIndex: 6, label: "Sat" },
+] as const;
 
 interface Props {
   values: HeatmapValue[];
@@ -19,7 +29,7 @@ function getClassForCount(count: number): string {
 }
 
 const LEGEND_COLORS: Record<string, string> = {
-  "color-empty":   "#1e293b",
+  "color-empty":   "#2d3f55",
   "color-scale-1": "#166534",
   "color-scale-2": "#16a34a",
   "color-scale-3": "#22c55e",
@@ -31,13 +41,37 @@ export default function HeatmapCalendar({ values }: Props) {
   const startDate = new Date(today);
   startDate.setFullYear(today.getFullYear() - 1);
 
+  const wrapperRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const group = wrapperRef.current?.querySelector(
+      ".react-calendar-heatmap-weekday-labels"
+    );
+    if (!group) return;
+
+    // Remove any labels we injected in a previous render before re-injecting.
+    group.querySelectorAll("[data-injected]").forEach((el) => el.remove());
+
+    MISSING_WEEKDAY_LABELS.forEach(({ dayIndex, label }) => {
+      // Formula matches the library: (dayIndex + 1) * SQUARE_SIZE + dayIndex * gutterSize
+      const y = (dayIndex + 1) * 10 + dayIndex * 1;
+      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
+      text.setAttribute("x", "0");
+      text.setAttribute("y", String(y));
+      text.setAttribute("class", "react-calendar-heatmap-weekday-label");
+      text.setAttribute("data-injected", "true");
+      text.textContent = label;
+      group.appendChild(text);
+    });
+  }, [values]);
+
   return (
     <div
       className="rounded-2xl p-5"
       style={{ background: "#1e2a3a", border: "1px solid rgba(255,255,255,0.07)" }}
     >
       <h2 className="text-white font-bold text-lg mb-4">Your Logs</h2>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto" ref={wrapperRef}>
         <CalendarHeatmap
           startDate={startDate}
           endDate={today}
@@ -55,7 +89,8 @@ export default function HeatmapCalendar({ values }: Props) {
               "data-tooltip-content": `${value.date}: ${value.count} log${value.count !== 1 ? "s" : ""}`,
             } as AnyAttrs;
           }) as AnyAttrs}
-          showWeekdayLabels
+          showWeekdayLabels={true}
+          weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
         />
       </div>
 
