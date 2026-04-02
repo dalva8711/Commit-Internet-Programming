@@ -2,7 +2,9 @@ import type { Log, Habit } from "@/lib/types";
 
 interface Props {
   logs: Log[];
+  allLogs: Log[];
   habits: Habit[];
+  selectedHabitName: string | null;
 }
 
 function getLogsPerWeek(logs: Log[]): number {
@@ -52,15 +54,23 @@ function StatCard({ label, value }: StatCardProps) {
   );
 }
 
-export default function StatsCards({ logs, habits }: Props) {
+export default function StatsCards({ logs, allLogs, habits, selectedHabitName }: Props) {
   const totalLogs = logs.length;
   const logsPerWeek = getLogsPerWeek(logs);
-  const { most, least } = getMostLeastLogged(logs, habits);
+  const { most, least } = getMostLeastLogged(allLogs, habits);
+
+  const totalLabel = selectedHabitName
+    ? `Total ${selectedHabitName} Logs`
+    : "Net Total Logs";
+
+  const weekLabel = selectedHabitName
+    ? `${selectedHabitName} Logs Per Week`
+    : "Logs Per Week";
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
       <StatCard
-        label="Total Logs"
+        label={totalLabel}
         value={
           <span className="text-green-400">
             {totalLogs.toLocaleString()}
@@ -68,7 +78,7 @@ export default function StatsCards({ logs, habits }: Props) {
         }
       />
       <StatCard
-        label="Logs Per Week"
+        label={weekLabel}
         value={<span className="text-slate-100">{logsPerWeek}</span>}
       />
       <StatCard
