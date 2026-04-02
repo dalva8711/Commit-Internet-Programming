@@ -31,7 +31,7 @@ export default async function HomePage() {
     <div className="min-h-screen">
       <Navbar />
 
-      <main className="max-w-3xl mx-auto px-4 pb-12 space-y-5">
+      <main className="max-w-7xl mx-auto px-4 md:px-6 lg:px-8 pb-12 space-y-5">
         <Suspense
           fallback={
             <p className="text-center text-cyan-400 text-sm animate-pulse">

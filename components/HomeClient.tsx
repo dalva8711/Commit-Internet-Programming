@@ -34,18 +34,23 @@ export default function HomeClient({ habits, logs }: Props) {
   );
 
   return (
-    <>
+    <div className="space-y-5">
       <HabitTabs
         habits={habits}
         selectedHabitId={selectedHabitId}
         onSelect={setSelectedHabitId}
       />
 
-      <HeatmapCalendar values={heatmapValues} />
-
-      <AddLogForm habits={habits} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <div className="lg:col-span-2">
+          <HeatmapCalendar values={heatmapValues} />
+        </div>
+        <div>
+          <AddLogForm habits={habits} />
+        </div>
+      </div>
 
       <StatsCards logs={filteredLogs} habits={habits} />
-    </>
+    </div>
   );
 }

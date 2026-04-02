@@ -59,3 +59,12 @@ body {
   stroke: #94a3b8;
   stroke-width: 1;
 }
+
+/* ── Scrollbar utility ── */
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
