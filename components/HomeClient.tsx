@@ -23,6 +23,11 @@ function buildHeatmapValues(logs: Log[]): HeatmapValue[] {
 export default function HomeClient({ habits, logs }: Props) {
   const [selectedHabitId, setSelectedHabitId] = useState<string | null>(null);
 
+  const selectedHabitName = useMemo(
+    () => habits.find((h) => h.id === selectedHabitId)?.name ?? null,
+    [habits, selectedHabitId]
+  );
+
   const filteredLogs = useMemo(() => {
     if (selectedHabitId === null) return logs;
     return logs.filter((l) => l.habit_id === selectedHabitId);
@@ -50,7 +55,12 @@ export default function HomeClient({ habits, logs }: Props) {
         </div>
       </div>
 
-      <StatsCards logs={filteredLogs} habits={habits} />
+      <StatsCards
+        logs={filteredLogs}
+        allLogs={logs}
+        habits={habits}
+        selectedHabitName={selectedHabitName}
+      />
     </div>
   );
 }
