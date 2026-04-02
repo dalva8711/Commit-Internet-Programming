@@ -3,7 +3,7 @@ import { logout } from "@/app/actions/auth";
 
 export default function Navbar() {
   return (
-    <nav className="flex items-center justify-between px-6 py-4">
+    <nav className="sticky top-0 z-30 flex items-center justify-between px-6 py-4 backdrop-blur-md">
       <Link
         href="/home"
         className="text-2xl font-bold text-cyan-400 hover:text-cyan-300 transition-colors cursor-default"
