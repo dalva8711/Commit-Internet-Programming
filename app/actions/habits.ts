@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { isHabitPresetColor } from "@/lib/habit-presets";
 import { createClient } from "@/lib/supabase/server";
 
 export async function createHabit(formData: FormData) {
@@ -11,9 +12,13 @@ export async function createHabit(formData: FormData) {
   if (!user) return { error: "Not authenticated" };
 
   const name = (formData.get("name") as string)?.trim();
-  const color = formData.get("color") as string;
+  const colorRaw = formData.get("color");
 
   if (!name) return { error: "Habit name is required" };
+  if (!isHabitPresetColor(colorRaw)) {
+    return { error: "Pick a color from the preset options." };
+  }
+  const color = (colorRaw as string).trim().toLowerCase();
 
   const { error } = await supabase
     .from("habits")
