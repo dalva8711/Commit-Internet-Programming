@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState, useTransition, useRef, useEffect } from "react";
 import { createHabit, deleteHabit } from "@/app/actions/habits";
 import type { Habit } from "@/lib/types";
 
@@ -15,17 +15,63 @@ const PRESET_COLORS = [
   "#ec4899", // pink
 ];
 
+const FOCUSABLE =
+  'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
+
 interface Props {
   habits: Habit[];
   onClose: () => void;
+  openerRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
-export default function HabitManager({ habits, onClose }: Props) {
+export default function HabitManager({ habits, onClose, openerRef }: Props) {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PRESET_COLORS[0]);
   const [error, setError] = useState<string | null>(null);
   const [isAdding, startAddTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  // Focus the first focusable element when the modal opens.
+  useEffect(() => {
+    const first = modalRef.current?.querySelector<HTMLElement>(FOCUSABLE);
+    first?.focus();
+  }, []);
+
+  // Restore focus to the opener button when the modal unmounts.
+  useEffect(() => {
+    return () => {
+      openerRef?.current?.focus();
+    };
+  }, [openerRef]);
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
+    if (e.key === "Escape") {
+      onClose();
+      return;
+    }
+    if (e.key !== "Tab") return;
+
+    const focusable = Array.from(
+      modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []
+    );
+    if (focusable.length === 0) return;
+
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
 
   function handleAdd(e: React.FormEvent) {
     e.preventDefault();
@@ -57,11 +103,16 @@ export default function HabitManager({ habits, onClose }: Props) {
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <div
+        ref={modalRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="habit-manager-title"
         className="w-full max-w-md rounded-2xl p-6"
         style={{ background: "#1e2a3a", border: "1px solid rgba(255,255,255,0.1)" }}
+        onKeyDown={handleKeyDown}
       >
         <div className="flex items-center justify-between mb-5">
-          <h2 className="text-lg font-bold text-slate-100">Manage Habits</h2>
+          <h2 id="habit-manager-title" className="text-lg font-bold text-slate-100">Manage Habits</h2>
           <button
             onClick={onClose}
             className="text-slate-400 hover:text-slate-200 text-xl leading-none"

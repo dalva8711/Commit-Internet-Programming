@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import type { Habit } from "@/lib/types";
 import HabitManager from "./HabitManager";
 
@@ -12,6 +12,7 @@ interface Props {
 
 export default function HabitTabs({ habits, selectedHabitId, onSelect }: Props) {
   const [showManager, setShowManager] = useState(false);
+  const openerRef = useRef<HTMLButtonElement>(null);
 
   return (
     <>
@@ -50,6 +51,7 @@ export default function HabitTabs({ habits, selectedHabitId, onSelect }: Props) 
 
         {/* Add / manage button */}
         <button
+          ref={openerRef}
           onClick={() => setShowManager(true)}
           className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-200 transition-colors text-xl leading-none"
           style={{ background: "rgba(255,255,255,0.08)", border: "1px solid rgba(255,255,255,0.15)" }}
@@ -60,7 +62,7 @@ export default function HabitTabs({ habits, selectedHabitId, onSelect }: Props) 
       </div>
 
       {showManager && (
-        <HabitManager habits={habits} onClose={() => setShowManager(false)} />
+        <HabitManager habits={habits} onClose={() => setShowManager(false)} openerRef={openerRef} />
       )}
     </>
   );
