@@ -2,18 +2,8 @@
 
 import { useState, useTransition, useRef, useEffect } from "react";
 import { createHabit, deleteHabit } from "@/app/actions/habits";
+import { HABIT_PRESET_COLORS, type HabitPresetColor } from "@/lib/habit-presets";
 import type { Habit } from "@/lib/types";
-
-const PRESET_COLORS = [
-  "#22d3ee", // cyan
-  "#4ade80", // green
-  "#f97316", // orange
-  "#a855f7", // purple
-  "#f43f5e", // rose
-  "#facc15", // yellow
-  "#3b82f6", // blue
-  "#ec4899", // pink
-];
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, textarea, select, [tabindex]:not([tabindex="-1"])';
@@ -26,7 +16,7 @@ interface Props {
 
 export default function HabitManager({ habits, onClose, openerRef }: Props) {
   const [name, setName] = useState("");
-  const [color, setColor] = useState(PRESET_COLORS[0]);
+  const [color, setColor] = useState<HabitPresetColor>(HABIT_PRESET_COLORS[0]);
   const [error, setError] = useState<string | null>(null);
   const [isAdding, startAddTransition] = useTransition();
   const [isDeleting, startDeleteTransition] = useTransition();
@@ -133,7 +123,7 @@ export default function HabitManager({ habits, onClose, openerRef }: Props) {
             className="w-full bg-transparent border border-slate-600 rounded-lg px-3 py-2 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm mb-3"
           />
           <div className="flex gap-2 mb-3 flex-wrap">
-            {PRESET_COLORS.map((c) => (
+            {HABIT_PRESET_COLORS.map((c) => (
               <button
                 key={c}
                 type="button"
