@@ -21,7 +21,7 @@ const FOCUSABLE =
 interface Props {
   habits: Habit[];
   onClose: () => void;
-  openerRef?: React.RefObject<HTMLButtonElement>;
+  openerRef?: React.RefObject<HTMLButtonElement | null>;
 }
 
 export default function HabitManager({ habits, onClose, openerRef }: Props) {
