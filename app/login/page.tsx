@@ -35,8 +35,8 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-3">
           <input
-            name="identifier"
-            type="text"
+            name="email"
+            type="email"
             placeholder="Email"
             required
             className="w-full bg-transparent border border-slate-600 rounded-lg px-4 py-3 text-slate-300 placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm"
