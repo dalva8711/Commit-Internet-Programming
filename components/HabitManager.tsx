@@ -30,8 +30,9 @@ export default function HabitManager({ habits, onClose, openerRef }: Props) {
 
   // Restore focus to the opener button when the modal unmounts.
   useEffect(() => {
+    const opener = openerRef?.current;
     return () => {
-      openerRef?.current?.focus();
+      opener?.focus();
     };
   }, [openerRef]);
 

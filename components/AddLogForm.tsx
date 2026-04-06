@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useTransition } from "react";
 import { createLog } from "@/app/actions/logs";
 import type { Habit } from "@/lib/types";
 
@@ -18,11 +18,9 @@ export default function AddLogForm({ habits }: Props) {
 
   const [habitId, setHabitId] = useState(habits[0]?.id ?? "");
 
-  useEffect(() => {
-    if (habits.length > 0 && !habits.some((h) => h.id === habitId)) {
-      setHabitId(habits[0].id);
-    }
-  }, [habits, habitId]);
+  const effectiveHabitId = habits.some((h) => h.id === habitId)
+    ? habitId
+    : (habits[0]?.id ?? "");
 
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -35,7 +33,7 @@ export default function AddLogForm({ habits }: Props) {
     setSuccess(false);
 
     const formData = new FormData();
-    formData.append("habitId", habitId);
+    formData.append("habitId", effectiveHabitId);
     formData.append("notes", notes);
 
     startTransition(async () => {
@@ -75,7 +73,7 @@ export default function AddLogForm({ habits }: Props) {
 
       <form onSubmit={handleSubmit} className="space-y-3">
         <select
-          value={habitId}
+          value={effectiveHabitId}
           onChange={(e) => setHabitId(e.target.value)}
           required
           className="w-full rounded-lg px-3 py-2.5 text-slate-200 text-sm focus:outline-none focus:ring-1 focus:ring-cyan-500"
