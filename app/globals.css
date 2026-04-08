@@ -55,6 +55,10 @@ body {
   rx: 2;
 }
 
+.react-calendar-heatmap rect {
+  cursor: pointer;
+}
+
 .react-calendar-heatmap rect:hover {
   stroke: #94a3b8;
   stroke-width: 1;

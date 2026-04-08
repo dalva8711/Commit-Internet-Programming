@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import { Tooltip } from "react-tooltip";
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type AnyAttrs = any;
-import type { HeatmapValue } from "@/lib/types";
+import type { HeatmapValue, Log } from "@/lib/types";
+import DayLogsModal from "./DayLogsModal";
 
 // The library hardcodes `dayIndex & 1`, so only Mon/Wed/Fri are ever rendered.
 // We inject the 4 missing labels (Sun/Tue/Thu/Sat) directly into the SVG after mount.
@@ -18,6 +19,7 @@ const MISSING_WEEKDAY_LABELS = [
 
 interface Props {
   values: HeatmapValue[];
+  logs: Log[];
 }
 
 function getClassForCount(count: number): string {
@@ -36,12 +38,17 @@ const LEGEND_COLORS: Record<string, string> = {
   "color-scale-4": "#4ade80",
 };
 
-export default function HeatmapCalendar({ values }: Props) {
+export default function HeatmapCalendar({ values, logs }: Props) {
   const today = new Date();
   const startDate = new Date(today);
   startDate.setFullYear(today.getFullYear() - 1);
 
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+
+  const logsForDay = selectedDate
+    ? logs.filter((l) => l.logged_date === selectedDate)
+    : [];
 
   useEffect(() => {
     const group = wrapperRef.current?.querySelector(
@@ -91,6 +98,9 @@ export default function HeatmapCalendar({ values }: Props) {
           }) as AnyAttrs}
           showWeekdayLabels={true}
           weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
+          onClick={(value) => {
+            if (value?.date) setSelectedDate(value.date);
+          }}
         />
       </div>
 
@@ -113,6 +123,14 @@ export default function HeatmapCalendar({ values }: Props) {
       </div>
 
       <Tooltip id="heatmap-tooltip" />
+
+      {selectedDate && (
+        <DayLogsModal
+          date={selectedDate}
+          logs={logsForDay}
+          onClose={() => setSelectedDate(null)}
+        />
+      )}
     </div>
   );
 }
