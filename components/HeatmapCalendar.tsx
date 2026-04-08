@@ -2,11 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
+import type CalendarHeatmapNS from "react-calendar-heatmap";
 import { Tooltip } from "react-tooltip";
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type AnyAttrs = any;
 import type { HeatmapValue, Log } from "@/lib/types";
 import DayLogsModal from "./DayLogsModal";
+
+// Extend the library's TooltipDataAttrs to explicitly cover data-* attributes,
+// which are valid DOM pass-throughs but absent from SVGAttributes<SVGSVGElement>.
+type TooltipAttrs = CalendarHeatmapNS.TooltipDataAttrs & {
+  [key: `data-${string}`]: string | undefined;
+};
 
 // The library hardcodes `dayIndex & 1`, so only Mon/Wed/Fri are ever rendered.
 // We inject the 4 missing labels (Sun/Tue/Thu/Sat) directly into the SVG after mount.
@@ -59,9 +64,21 @@ export default function HeatmapCalendar({ values, logs }: Props) {
     // Remove any labels we injected in a previous render before re-injecting.
     group.querySelectorAll("[data-injected]").forEach((el) => el.remove());
 
+    // Derive SQUARE_SIZE and gutterSize from the library's own rendered labels
+    // (Mon = dayIndex 1, Wed = dayIndex 3) so we stay correct across library upgrades.
+    // Formula: y = (dayIndex + 1) * S + dayIndex * G
+    //   2S + G = y_Mon  (dayIndex 1)
+    //   4S + 3G = y_Wed (dayIndex 3)  →  G = y_Wed − 2·y_Mon,  S = (y_Mon − G) / 2
+    const existingTexts = Array.from(
+      group.querySelectorAll<SVGTextElement>("text:not([data-injected])")
+    );
+    const yMon = parseFloat(existingTexts[0]?.getAttribute("y") ?? "21");
+    const yWed = parseFloat(existingTexts[1]?.getAttribute("y") ?? "43");
+    const derivedGutter = yWed - 2 * yMon;
+    const derivedSquare = (yMon - derivedGutter) / 2;
+
     MISSING_WEEKDAY_LABELS.forEach(({ dayIndex, label }) => {
-      // Formula matches the library: (dayIndex + 1) * SQUARE_SIZE + dayIndex * gutterSize
-      const y = (dayIndex + 1) * 10 + dayIndex * 1;
+      const y = (dayIndex + 1) * derivedSquare + dayIndex * derivedGutter;
       const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
       text.setAttribute("x", "0");
       text.setAttribute("y", String(y));
@@ -87,15 +104,18 @@ export default function HeatmapCalendar({ values, logs }: Props) {
             if (!value) return "color-empty";
             return getClassForCount(value.count);
           }}
-          tooltipDataAttrs={((value: HeatmapValue | undefined) => {
-            if (!value || !value.date) {
-              return { "data-tooltip-id": "heatmap-tooltip" } as AnyAttrs;
+          tooltipDataAttrs={(
+            value: CalendarHeatmapNS.ReactCalendarHeatmapValue<string> | undefined
+          ): TooltipAttrs => {
+            if (!value?.date) {
+              return { "data-tooltip-id": "heatmap-tooltip" };
             }
+            const count = (value.count as number | undefined) ?? 0;
             return {
               "data-tooltip-id": "heatmap-tooltip",
-              "data-tooltip-content": `${value.date}: ${value.count} log${value.count !== 1 ? "s" : ""}`,
-            } as AnyAttrs;
-          }) as AnyAttrs}
+              "data-tooltip-content": `${value.date}: ${count} log${count !== 1 ? "s" : ""}`,
+            };
+          }}
           showWeekdayLabels={true}
           weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
           onClick={(value) => {
