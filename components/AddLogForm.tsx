@@ -8,6 +8,10 @@ interface Props {
   habits: Habit[];
 }
 
+function toLocalISODate(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
 export default function AddLogForm({ habits }: Props) {
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long",
@@ -34,6 +38,7 @@ export default function AddLogForm({ habits }: Props) {
 
     const formData = new FormData();
     formData.append("habitId", effectiveHabitId);
+    formData.append("logged_date", toLocalISODate(new Date()));
     formData.append("notes", notes);
 
     startTransition(async () => {

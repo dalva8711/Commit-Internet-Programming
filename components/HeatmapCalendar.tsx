@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CalendarHeatmap from "react-calendar-heatmap";
 import type CalendarHeatmapNS from "react-calendar-heatmap";
 import { Tooltip } from "react-tooltip";
@@ -13,14 +13,6 @@ type TooltipAttrs = CalendarHeatmapNS.TooltipDataAttrs & {
   [key: `data-${string}`]: string | undefined;
 };
 
-// The library hardcodes `dayIndex & 1`, so only Mon/Wed/Fri are ever rendered.
-// We inject the 4 missing labels (Sun/Tue/Thu/Sat) directly into the SVG after mount.
-const MISSING_WEEKDAY_LABELS = [
-  { dayIndex: 0, label: "Sun" },
-  { dayIndex: 2, label: "Tue" },
-  { dayIndex: 4, label: "Thu" },
-  { dayIndex: 6, label: "Sat" },
-] as const;
 
 interface Props {
   values: HeatmapValue[];
@@ -55,39 +47,37 @@ export default function HeatmapCalendar({ values, logs }: Props) {
     ? logs.filter((l) => l.logged_date === selectedDate)
     : [];
 
+  // The library places each weekday label's baseline at the BOTTOM edge of its row.
+  // Re-center the Mon/Wed/Fri labels by deriving the square size from the library's
+  // own rendered y values and repositioning each label at the row's vertical midpoint.
   useEffect(() => {
     const group = wrapperRef.current?.querySelector(
       ".react-calendar-heatmap-weekday-labels"
     );
     if (!group) return;
 
-    // Remove any labels we injected in a previous render before re-injecting.
-    group.querySelectorAll("[data-injected]").forEach((el) => el.remove());
-
-    // Derive SQUARE_SIZE and gutterSize from the library's own rendered labels
-    // (Mon = dayIndex 1, Wed = dayIndex 3) so we stay correct across library upgrades.
-    // Formula: y = (dayIndex + 1) * S + dayIndex * G
-    //   2S + G = y_Mon  (dayIndex 1)
-    //   4S + 3G = y_Wed (dayIndex 3)  →  G = y_Wed − 2·y_Mon,  S = (y_Mon − G) / 2
-    const existingTexts = Array.from(
-      group.querySelectorAll<SVGTextElement>("text:not([data-injected])")
+    const texts = Array.from(
+      group.querySelectorAll<SVGTextElement>("text")
     );
-    const yMon = parseFloat(existingTexts[0]?.getAttribute("y") ?? "21");
-    const yWed = parseFloat(existingTexts[1]?.getAttribute("y") ?? "43");
-    const derivedGutter = yWed - 2 * yMon;
-    const derivedSquare = (yMon - derivedGutter) / 2;
+    if (texts.length < 2) return;
 
-    MISSING_WEEKDAY_LABELS.forEach(({ dayIndex, label }) => {
-      const y = (dayIndex + 1) * derivedSquare + dayIndex * derivedGutter;
-      const text = document.createElementNS("http://www.w3.org/2000/svg", "text");
-      text.setAttribute("x", "0");
-      text.setAttribute("y", String(y));
-      text.setAttribute("class", "react-calendar-heatmap-weekday-label");
-      text.setAttribute("data-injected", "true");
-      text.textContent = label;
-      group.appendChild(text);
+    const yMon = parseFloat(texts[0].getAttribute("y") ?? "21");
+    const yWed = parseFloat(texts[1].getAttribute("y") ?? "43");
+    // Mon = dayIndex 1, Wed = dayIndex 3  →  difference spans 2 rows
+    const squareSizeWithGutter = (yWed - yMon) / 2;
+
+    [1, 3, 5].forEach((dayIndex, i) => {
+      texts[i]?.setAttribute("y", String((dayIndex + 0.5) * squareSizeWithGutter));
     });
   }, [values]);
+
+  // "YYYY-MM-DD" strings are parsed as UTC midnight by the library (JS spec).
+  // Appending T00:00:00 (no Z) forces local-midnight parsing, which matches
+  // the library's own start/end date arithmetic and keeps squares on the correct day.
+  const localValues = useMemo(
+    () => values.map((v) => ({ ...v, date: `${v.date}T00:00:00` })),
+    [values]
+  );
 
   return (
     <div
@@ -99,7 +89,7 @@ export default function HeatmapCalendar({ values, logs }: Props) {
         <CalendarHeatmap
           startDate={startDate}
           endDate={today}
-          values={values}
+          values={localValues}
           classForValue={(value) => {
             if (!value) return "color-empty";
             return getClassForCount(value.count);
@@ -110,16 +100,16 @@ export default function HeatmapCalendar({ values, logs }: Props) {
             if (!value?.date) {
               return { "data-tooltip-id": "heatmap-tooltip" };
             }
+            const date = value.date.slice(0, 10);
             const count = (value.count as number | undefined) ?? 0;
             return {
               "data-tooltip-id": "heatmap-tooltip",
-              "data-tooltip-content": `${value.date}: ${count} log${count !== 1 ? "s" : ""}`,
+              "data-tooltip-content": `${date}: ${count} log${count !== 1 ? "s" : ""}`,
             };
           }}
           showWeekdayLabels={true}
-          weekdayLabels={["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]}
           onClick={(value) => {
-            if (value?.date) setSelectedDate(value.date);
+            if (value?.date) setSelectedDate(value.date.slice(0, 10));
           }}
         />
       </div>

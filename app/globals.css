@@ -25,6 +25,10 @@ body {
   font-size: 8px;
 }
 
+.react-calendar-heatmap-weekday-label {
+  dominant-baseline: central;
+}
+
 .react-calendar-heatmap .color-empty,
 .color-empty {
   fill: #2d3f55;

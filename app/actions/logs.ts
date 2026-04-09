@@ -15,10 +15,15 @@ export async function createLog(formData: FormData) {
 
   if (!habitId) return { error: "Please select a habit" };
 
-  // logged_date is set to CURRENT_DATE by the DB default + constraint
+  // Use the client's local date so the stored date matches what the user sees.
+  // Falls back to the DB's CURRENT_DATE default if the value is absent or malformed.
+  const rawDate = formData.get("logged_date") as string | null;
+  const isValidDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate ?? "");
+
   const { error } = await supabase.from("logs").insert({
     user_id: user.id,
     habit_id: habitId,
+    ...(isValidDate && { logged_date: rawDate }),
     notes,
   });
 
